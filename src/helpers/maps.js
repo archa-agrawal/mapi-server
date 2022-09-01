@@ -11,10 +11,10 @@ const addMap = ({ heading, description, theme }, userId) => {
     .returning("*");
 };
 
-const deleteMap = (mapId, userId) => {
+const deleteMap = (id, userId) => {
   return knex("maps")
     .where({
-      id: mapId,
+      id,
       creator_id: userId,
     })
     .delete();
@@ -50,20 +50,23 @@ const getMap = async (id, userId) => {
       .where({
         id: creatorId,
       })
-      .select("first_name", "lasta_name")
+      .select("first_name", "last_name")
       .first();
-    const locations = await knex("locations")
+    const dbLocations = await knex("locations")
       .where({
         map_id: id,
       })
-      .select("id", "title", "description", "longitude", "latitude")
-      .map(({ id, title, description, longitude, latitude }) => ({
+      .select("id", "title", "description", "longitude", "latitude", "type");
+    const locations = dbLocations.map(
+      ({ id, title, description, longitude, latitude, type }) => ({
         id,
         title,
         description,
         longitude,
         latitude,
-      }));
+        type,
+      })
+    );
 
     return {
       id,
@@ -81,8 +84,8 @@ const getMap = async (id, userId) => {
   return null;
 };
 
-const getMaps = (userId) => {
-  return knex("maps as m")
+const getMaps = async (userId) => {
+  const maps = await knex("maps as m")
     .join("users as u", "m.creator_id", "=", "u.id")
     .select(
       "m.id",
@@ -90,31 +93,34 @@ const getMaps = (userId) => {
       "m.description",
       "m.theme",
       "m.creator_id",
+      "m.created_at",
       "u.first_name",
       "u.last_name",
       "u.avatar"
-    )
-    .map(
-      ({
-        id,
-        heading,
-        description,
-        theme,
-        creator_id: creatorId,
-        first_name: firstName,
-        last_name: lastName,
-      }) => ({
-        id,
-        heading,
-        description,
-        theme,
-        user: {
-          firstName,
-          lastName,
-        },
-        owned: userId === creatorId,
-      })
     );
+  return maps.map(
+    ({
+      id,
+      heading,
+      description,
+      theme,
+      creator_id: creatorId,
+      first_name: firstName,
+      last_name: lastName,
+      created_at: createdAt,
+    }) => ({
+      id,
+      heading,
+      description,
+      theme,
+      user: {
+        firstName,
+        lastName,
+      },
+      owned: userId === creatorId,
+      createdAt,
+    })
+  );
 };
 
 module.exports = {
