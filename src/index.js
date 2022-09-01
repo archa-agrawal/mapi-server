@@ -1,2 +1,2 @@
-require("db");
-require("app");
+require("dotenv").config();
+require("./app");
