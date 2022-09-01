@@ -1,9 +1,5 @@
 const { Router } = require("express");
-const {
-  createUser,
-  loginRequired,
-  getUserProfile,
-} = require("../helpers/users");
+const { createUser, loginRequired } = require("../helpers/users");
 const passport = require("../auth/local");
 
 module.exports = () => {
@@ -35,8 +31,13 @@ module.exports = () => {
   });
 
   router.get("/profile", loginRequired, async (req, res) => {
-    console.log(req.user);
-    res.send(await getUserProfile(req.user));
+    res.send({
+      id: req.user.id,
+      email: req.user.email,
+      firstName: req.user.first_name,
+      lastName: req.user.last_name,
+      avatar: req.user.avatar,
+    });
   });
 
   return router;

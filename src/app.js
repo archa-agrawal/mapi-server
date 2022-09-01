@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
 const userController = require("./controllers/users");
+const mapController = require("./controllers/maps");
 
 const app = express();
 /*** middleware ***/
@@ -30,6 +31,7 @@ app.use(passport.session());
 /*** middleware end ***/
 
 app.use("/user", userController());
+app.use("/map", mapController());
 
 app.listen(5000, () => {
   console.log("Server started");

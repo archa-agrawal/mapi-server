@@ -18,22 +18,7 @@ const loginRequired = (req, res, next) => {
   return next();
 };
 
-const getUserProfile = async ({ email }) => {
-  console.log("getting user");
-  const dbUser = await knex("users").where({ email }).first();
-  console.log("got user", dbUser);
-
-  return {
-    id: dbUser.id,
-    email: dbUser.email,
-    firstName: dbUser.first_name,
-    lastName: dbUser.last_name,
-    avatar: dbUser.avatar,
-  };
-};
-
 module.exports = {
   createUser,
   loginRequired,
-  getUserProfile,
 };
