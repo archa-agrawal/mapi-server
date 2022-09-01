@@ -43,17 +43,20 @@ const getMap = async (id, userId) => {
     .where({
       id,
     })
+    .select("heading", "description", "theme", "creator_id")
     .first();
   if (creatorId) {
     const { first_name: firstName, last_name: lastName } = await knex("users")
       .where({
         id: creatorId,
       })
+      .select("first_name", "lasta_name")
       .first();
     const locations = await knex("locations")
       .where({
         map_id: id,
       })
+      .select("id", "title", "description", "longitude", "latitude")
       .map(({ id, title, description, longitude, latitude }) => ({
         id,
         title,
@@ -78,9 +81,46 @@ const getMap = async (id, userId) => {
   return null;
 };
 
+const getMaps = (userId) => {
+  return knex("maps as m")
+    .join("users as u", "m.creator_id", "=", "u.id")
+    .select(
+      "m.id",
+      "m.heading",
+      "m.description",
+      "m.theme",
+      "m.creator_id",
+      "u.first_name",
+      "u.last_name",
+      "u.avatar"
+    )
+    .map(
+      ({
+        id,
+        heading,
+        description,
+        theme,
+        creator_id: creatorId,
+        first_name: firstName,
+        last_name: lastName,
+      }) => ({
+        id,
+        heading,
+        description,
+        theme,
+        user: {
+          firstName,
+          lastName,
+        },
+        owned: userId === creatorId,
+      })
+    );
+};
+
 module.exports = {
   addMap,
   deleteMap,
   updateMap,
   getMap,
+  getMaps,
 };
