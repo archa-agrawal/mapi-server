@@ -12,7 +12,8 @@ module.exports = () => {
   const router = Router();
 
   router.post("/", loginRequired, async (req, res) => {
-    res.send(await addMap(req.body, req.user.id));
+    console.log(req.body);
+    res.send(await addMap(req.body, req.user));
   });
 
   router.delete("/", loginRequired, async (req, res) => {

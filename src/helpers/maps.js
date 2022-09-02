@@ -1,23 +1,45 @@
 const knex = require("../db");
 
-const addMap = ({ heading, description, theme }, userId) => {
-  return knex("maps")
+const addMap = async (
+  { heading, description, theme },
+  { id: userId, first_name: firstName, last_name: lastName }
+) => {
+  const [{ id, created_at: createdAt }] = await knex("maps")
     .insert({
       heading,
       description,
       theme,
       creator_id: userId,
     })
-    .returning("*");
+    .returning(["id", "created_at"]);
+  console.log(id, createdAt);
+  return {
+    id,
+    heading,
+    description,
+    theme,
+    owned: true,
+    createdAt,
+    creator: {
+      firstName,
+      lastName,
+    },
+  };
 };
 
-const deleteMap = (id, userId) => {
-  return knex("maps")
+const deleteMap = async (id, userId) => {
+  const map = await knex("maps")
     .where({
       id,
       creator_id: userId,
     })
-    .delete();
+    .select("id")
+    .first();
+  if (map) {
+    await knex("locations").where({ map_id: id }).delete();
+    return knex("maps").where({ id }).delete();
+  }
+  return null;
 };
 
 const updateMap = ({ id, heading, description, theme }, userId) => {
@@ -85,6 +107,7 @@ const getMap = async (id, userId) => {
 };
 
 const getMaps = async (userId) => {
+  console.log(userId);
   const maps = await knex("maps as m")
     .join("users as u", "m.creator_id", "=", "u.id")
     .select(

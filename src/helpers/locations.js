@@ -8,7 +8,7 @@ const addLocation = async (
     .where({ id: mapId, creator_id: userId })
     .first();
   if (map) {
-    return knex("locations")
+    const [{ id }] = await knex("locations")
       .insert({
         title,
         description,
@@ -17,7 +17,16 @@ const addLocation = async (
         latitude,
         map_id: mapId,
       })
-      .returning("*");
+      .returning("id");
+    return {
+      id,
+      title,
+      description,
+      type,
+      longitude,
+      latitude,
+      mapId,
+    };
   }
   return null;
 };
