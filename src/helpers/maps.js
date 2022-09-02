@@ -12,7 +12,6 @@ const addMap = async (
       creator_id: userId,
     })
     .returning(["id", "created_at"]);
-  console.log(id, createdAt);
   return {
     id,
     heading,
@@ -107,7 +106,6 @@ const getMap = async (id, userId) => {
 };
 
 const getMaps = async (userId) => {
-  console.log(userId);
   const maps = await knex("maps as m")
     .join("users as u", "m.creator_id", "=", "u.id")
     .select(
