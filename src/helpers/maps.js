@@ -113,7 +113,7 @@ const getMaps = async (userId) => {
       heading,
       description,
       theme,
-      user: {
+      creator: {
         firstName,
         lastName,
       },

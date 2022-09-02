@@ -5,12 +5,24 @@ const passport = require("../auth/local");
 module.exports = () => {
   const _login = (req, res, next) => {
     passport.authenticate("local", (err, user) => {
-      if (err) throw err;
-      if (!user) res.send("No User Exists");
+      if (err) {
+        console.error(err);
+        res.sendStatus(500);
+      }
+      if (!user) res.sendStatus(401);
       else {
         req.logIn(user, (err) => {
-          if (err) throw err;
-          res.send("Successfully Authenticated");
+          if (err) {
+            console.error(err);
+            res.sendStatus(500);
+          }
+          res.send({
+            id: user.id,
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            avatar: user.avatar,
+          });
         });
       }
     })(req, res, next);
@@ -18,8 +30,13 @@ module.exports = () => {
 
   const router = Router();
   router.post("/register", async (req, res, next) => {
-    await createUser(req.body);
-    _login(req, res, next);
+    try {
+      await createUser(req.body);
+      _login(req, res, next);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
   });
 
   router.post("/login", (req, res, next) => {
@@ -27,7 +44,9 @@ module.exports = () => {
   });
 
   router.post("/logout", loginRequired, (req, res) => {
-    req.logout(() => res.send("logged out"));
+    req.logout(() => {
+      res.sendStatus(200);
+    });
   });
 
   router.get("/profile", loginRequired, async (req, res) => {

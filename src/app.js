@@ -15,7 +15,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: process.env.UI_SERVER, // <-- location of the react app were connecting to
+    origin: process.env.UI_SERVER,
+    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
     credentials: true,
   })
 );
@@ -23,7 +24,13 @@ app.use(
   session({
     secret: process.env.SECRET_KEY,
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: false,
+      sameSite: false,
+    },
   })
 );
 app.use(passport.initialize());
@@ -36,5 +43,5 @@ app.use("/map", mapController());
 app.use("/location", locationController());
 
 app.listen(5000, () => {
-  console.log("Server started");
+  console.info("Server started");
 });
