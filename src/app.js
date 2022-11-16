@@ -44,7 +44,7 @@ knex.migrate.latest().then(() => {
   app.use("/map", mapController());
   app.use("/location", locationController());
 
-  app.listen(5000, () => {
+  app.listen(80, () => {
     console.info("Server started");
   });
 });
