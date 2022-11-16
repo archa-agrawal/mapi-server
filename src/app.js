@@ -22,6 +22,7 @@ knex.migrate.latest().then(() => {
       credentials: true,
     })
   );
+  app.set('trust proxy', 1);
   app.use(
     session({
       secret: process.env.SECRET_KEY,
