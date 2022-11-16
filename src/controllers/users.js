@@ -30,7 +30,7 @@ module.exports = () => {
 
   const router = Router();
   router.post("/register", async (req, res, next) => {
-    //return res.sendStatus(401);
+    return res.sendStatus(401);
     try {
       await createUser(req.body);
       _login(req, res, next);
